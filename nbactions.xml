@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+    <action>
+        <actionName>CUSTOM-safe-compile</actionName>
+        <displayName>safe-compile</displayName>
+        <goals>
+            <goal>clean</goal>
+            <goal>verify</goal>
+        </goals>
+        <activatedProfiles>
+            <activatedProfile>safer</activatedProfile>
+        </activatedProfiles>
+    </action>
+    <action>
+        <actionName>CUSTOM-travis-compile</actionName>
+        <displayName>travis-compile</displayName>
+        <goals>
+            <goal>clean</goal>
+            <goal>verify</goal>
+        </goals>
+        <activatedProfiles>
+            <activatedProfile>safer</activatedProfile>
+            <activatedProfile>integration</activatedProfile>
+        </activatedProfiles>
+        <properties>
+            <checkstyle.consoleOutput>false</checkstyle.consoleOutput>
+        </properties>
+    </action>
+    <action>
+        <actionName>CUSTOM-update version</actionName>
+        <displayName>update version</displayName>
+        <goals>
+            <goal>versions:update-child-modules</goal>
+            <goal>-N</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-versions commit</actionName>
+        <displayName>versions commit</displayName>
+        <goals>
+            <goal>versions:commit</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-license-format</actionName>
+        <displayName>license-format</displayName>
+        <goals>
+            <goal>com.mycila:license-maven-plugin:format</goal>
+        </goals>
+    </action>
+    <action>
+        <actionName>CUSTOM-fast-install</actionName>
+        <displayName>fast-install</displayName>
+        <goals>
+            <goal>install</goal>
+        </goals>
+        <properties>
+            <skipTests>true</skipTests>
+        </properties>
+    </action>
+</actions>
