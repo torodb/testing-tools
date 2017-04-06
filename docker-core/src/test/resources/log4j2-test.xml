@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="ALL_TRACE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{hh:mm:ss.SSS} %highlight{%-5level} %-30.-30replace{'%t'}{\s}{-} %-30.30logger{1.} - %msg%n"/>
+        </Console>
+        <Console name="SIMPLE_TRACE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{hh:mm:ss.SSS} %highlight{%-5level} %-30.-30replace{'%t'}{\s}{-} %-30.30logger{1.} - %msg%n%throwable{short.localizedMessage}%n"/>
+        </Console>
+        <Console name="WITHOUT_TRACE" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{hh:mm:ss.SSS} %highlight{%-5level} %-30.-30replace{'%t'}{\s}{-} %-30.30logger{1.} - %msg%n%throwable{none}"/>
+        </Console>
+        <Async name="ASYNC">
+            <AppenderRef ref="router"/>
+        </Async>
+        
+        <Routing name="router">
+            <Routes>
+                <Script name="RoutingInit" language="JavaScript">
+                    <![CDATA[
+                        if (logEvent.getLevel().compareTo(org.apache.logging.log4j.Level.INFO) < 0) {
+                            "ALL_TRACE";
+                        }
+                        else if (logEvent.getThrown() != null) {
+                            "SIMPLE_TRACE"
+                        } else {
+                            "WITHOUT_TRACE"
+                        }
+                    ]]>
+                </Script>
+                <Route ref="WITHOUT_TRACE"/>
+                <Route key="ALL_TRACE" ref="ALL_TRACE"/>
+                <Route key="SIMPLE_TRACE" ref="SIMPLE_TRACE"/>
+            </Routes>
+        </Routing>
+    </Appenders>
+    <Loggers>
+        <!-- 8kData & ToroDB code -->
+        <Logger name="com.torodb" level="TRACE" additivity="false">
+            <AppenderRef ref="ASYNC" />
+        </Logger>
+        <Logger name="com.torodb.testing" level="WARN" additivity="false">
+            <AppenderRef ref="ASYNC" />
+        </Logger>
+        
+        <!-- Root -->
+
+        <Root level="WARN">
+            <AppenderRef ref="ASYNC"/>
+        </Root>
+    </Loggers>
+</Configuration>
