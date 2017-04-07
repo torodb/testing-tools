@@ -16,6 +16,9 @@
 
 package com.torodb.testing.mongodb.junit;
 
+import static java.time.Duration.ofMinutes;
+import static org.junit.jupiter.api.Assertions.assertTimeout;
+
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.torodb.testing.mongodb.docker.EnumVersion;
@@ -32,7 +35,7 @@ import org.junit.runner.RunWith;
         value = {
           @DataNode(EnumVersion.LATEST),
           @DataNode(EnumVersion.LATEST),
-          @DataNode(EnumVersion.v3_2)
+          @DataNode(EnumVersion.LATEST)
         },
         protocolVersion = 0
     )
@@ -41,13 +44,15 @@ public class RequiresReplicaSetTest {
 
   @Test
   public void startAndStop(ReplicaSet rs) {
-    MongoDatabase db = rs.getClient().getDatabase("testDb");
-    MongoCollection<Document> col = db.getCollection("testCol").withWriteConcern(
-        rs.getTotalWriteConcern()
-    );
-    for (int i = 0; i < 10; i++) {
-      col.insertOne(new Document());
-    }
+    assertTimeout(ofMinutes(2), () -> {
+      MongoDatabase db = rs.getClient().getDatabase("testDb");
+      MongoCollection<Document> col = db.getCollection("testCol").withWriteConcern(
+          rs.getTotalWriteConcern()
+      );
+      for (int i = 0; i < 10; i++) {
+        col.insertOne(new Document());
+      }
+    });
     
   }
 }
