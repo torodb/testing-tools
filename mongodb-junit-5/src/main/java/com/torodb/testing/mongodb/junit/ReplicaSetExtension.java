@@ -17,7 +17,7 @@
 package com.torodb.testing.mongodb.junit;
 
 import com.torodb.testing.core.junit5.AnnotationFinder;
-import com.torodb.testing.core.junit5.SimplifiedParameterResolver;
+import com.torodb.testing.core.junit5.CloseableParameterResolver;
 import com.torodb.testing.mongodb.docker.ReplicaSet;
 import com.torodb.testing.mongodb.docker.ReplicaSetConfig;
 import com.torodb.testing.mongodb.docker.ReplicaSetConfig.SecondaryConfig;
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 /**
  *
  */
-public class ReplicaSetExtension extends SimplifiedParameterResolver<ReplicaSet> {
+public class ReplicaSetExtension extends CloseableParameterResolver<ReplicaSet> {
 
   @Override
   protected Class<ReplicaSet> getParameterClass() {

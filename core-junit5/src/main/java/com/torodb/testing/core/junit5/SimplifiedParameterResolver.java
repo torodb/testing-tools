@@ -31,19 +31,45 @@ import java.util.Optional;
  * A {@link ParameterResolver} that can only inject a single parameter but instanciate it lazily.
  *
  * <p/>The parameter is stored on the {@link ExtensionContext#getStore() context store} and it is
- * removed {@link AfterAllCallback after all} tests on the annotated context are executed.
+ * removed {@link AfterAllCallback after all} tests on the annotated context are executed. It is
+ * also removed {@link AfterEachCallback after each method} if
+ * {@link #cleanAfterTest(org.junit.jupiter.api.extension.ExtensionContext) } returns true.
  */
 public abstract class SimplifiedParameterResolver<P>
     implements ParameterResolver, AfterEachCallback, AfterAllCallback {
 
+  /**
+   * The class of the resolved parameter.
+   */
   protected abstract Class<P> getParameterClass();
 
+  /**
+   * Creates the parameter value.
+   * 
+   * @param context the execution context on which the parameter was required
+   * @return the value that will be injected on the test execution
+   */
   protected abstract P createParamValue(ExtensionContext context);
 
+  /**
+   * Whether the injected parameter must be recalculated for each executed test.
+   *
+   * If this method returns true, then
+   * {@link #createParamValue(org.junit.jupiter.api.extension.ExtensionContext) } and
+   * {@link #cleanCallback(java.util.Optional) } will be called once for each test. If it returns
+   * false, the same injected parameter will be used for each test, calling createParamValue the
+   * first time the parameter is required and cleanCallback {@link AfterAllCallback after all} test
+   * have been executed.
+   */
   protected abstract boolean cleanAfterTest(ExtensionContext context);
 
-  protected void cleanCallback(Optional<P> param) {
-  }
+  /**
+   * It is called when the injected parameter is not going to be used anymore.
+   *
+   * @param param the parameter that will be used no more (or empty if it was an error while it was
+   *              being created).
+   */
+  protected abstract void cleanCallback(Optional<P> param);
 
   @Override
   public boolean supports(ParameterContext pc, ExtensionContext ec) throws

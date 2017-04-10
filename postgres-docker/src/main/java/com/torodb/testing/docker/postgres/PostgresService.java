@@ -73,8 +73,7 @@ public class PostgresService extends SimpleDockerService implements SqlService {
    *         configuration.
    */
   public static PostgresService defaultService(PostgresVersion version) {
-    PostgresConfig config = new PostgresConfig.Builder()
-        .setVersion(version)
+    PostgresConfig config = new PostgresConfig.Builder(version)
         .build();
     return defaultService(config);
   }
@@ -180,6 +179,10 @@ public class PostgresService extends SimpleDockerService implements SqlService {
   public DataSource getDatasource() {
     checkRunning();
     return dataSource;
+  }
+
+  public PostgresConfig getConfig() {
+    return config;
   }
 
   @Override
