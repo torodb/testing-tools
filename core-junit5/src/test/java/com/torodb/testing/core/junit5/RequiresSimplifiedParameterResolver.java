@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.torodb.testing.docker.sql;
 
-import com.google.common.net.HostAndPort;
-import com.torodb.testing.docker.DockerService;
-import org.jooq.DSLContext;
+package com.torodb.testing.core.junit5;
 
-import javax.sql.DataSource;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
  */
-public interface SqlService extends DockerService {
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@ExtendWith(MySimplifiedParameterResolver.class)
+public @interface RequiresSimplifiedParameterResolver {
 
-  public HostAndPort getAddress();
+  boolean cleanAfterTest();
 
-  public DataSource getDatasource();
-
-  public DSLContext getDslContext();
 }

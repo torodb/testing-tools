@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.torodb.testing.docker.sql;
 
-import com.google.common.net.HostAndPort;
-import com.torodb.testing.docker.DockerService;
-import org.jooq.DSLContext;
+package com.torodb.testing.core.junit5;
 
-import javax.sql.DataSource;
+import java.util.Optional;
 
 /**
  *
  */
-public interface SqlService extends DockerService {
+public abstract class CloseableParameterResolver<E extends AutoCloseable>
+    extends SimplifiedParameterResolver<E> {
 
-  public HostAndPort getAddress();
+  @Override
+  protected void cleanCallback(Optional<E> param) {
+    param.ifPresent(this::close);
+  }
 
-  public DataSource getDatasource();
+  protected void close(E param) {
+    try {
+      param.close();
+    } catch (Exception ex) {
+      throw new RuntimeException(ex);
+    }
+  }
 
-  public DSLContext getDslContext();
 }

@@ -17,7 +17,7 @@
 package com.torodb.testing.mongodb.junit;
 
 import com.torodb.testing.core.junit5.AnnotationFinder;
-import com.torodb.testing.core.junit5.SimplifiedParameterResolver;
+import com.torodb.testing.core.junit5.CloseableParameterResolver;
 import com.torodb.testing.mongodb.docker.DockerShardedCluster;
 import com.torodb.testing.mongodb.docker.ShardedCluster;
 import com.torodb.testing.mongodb.docker.ShardedClusterConfig;
@@ -26,7 +26,7 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 /**
  *
  */
-public class ShardedClusterExtension extends SimplifiedParameterResolver<ShardedCluster> {
+public class ShardedClusterExtension extends CloseableParameterResolver<ShardedCluster> {
 
   @Override
   protected Class<ShardedCluster> getParameterClass() {

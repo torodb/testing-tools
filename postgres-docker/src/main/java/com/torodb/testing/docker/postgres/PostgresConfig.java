@@ -37,6 +37,10 @@ public class PostgresConfig {
     this.version = version;
   }
 
+  public static PostgresConfig getDefaultConfig(PostgresVersion version) {
+    return new Builder(version).build();
+  }
+
   public String getUsername() {
     return username;
   }
@@ -63,6 +67,10 @@ public class PostgresConfig {
     private String host = "0.0.0.0";
     private String db = "test";
     private PostgresVersion version;
+
+    public Builder(PostgresVersion version) {
+      this.version = version;
+    }
 
     public Builder setUsername(String username) {
       this.username = username;

@@ -17,18 +17,17 @@ package com.torodb.testing.docker.postgres.junit5;
 
 
 import com.torodb.testing.core.junit5.AnnotationFinder;
-import com.torodb.testing.core.junit5.SimplifiedParameterResolver;
+import com.torodb.testing.core.junit5.CloseableParameterResolver;
 import com.torodb.testing.docker.postgres.PostgresConfig;
 import com.torodb.testing.docker.postgres.PostgresService;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import java.util.Optional;
 
 
 /**
  *
  */
-public class PostgresServiceExtension extends SimplifiedParameterResolver<PostgresService> {
+public class PostgresServiceExtension extends CloseableParameterResolver<PostgresService> {
 
   @Override
   protected Class<PostgresService> getParameterClass() {
@@ -49,18 +48,12 @@ public class PostgresServiceExtension extends SimplifiedParameterResolver<Postgr
     return findInjectorAnnotation(context).newForEachCase();
   }
 
-  @Override
-  protected void cleanCallback(Optional<PostgresService> param) {
-    param.ifPresent(PostgresService::close);
-  }
-
   private RequiresPostgres findInjectorAnnotation(ExtensionContext context) {
     return AnnotationFinder.resolve(context, RequiresPostgres.class);
   }
 
-  private static PostgresConfig transformAnnotation(RequiresPostgres annotation) {
-    return new PostgresConfig.Builder()
-        .setVersion(annotation.version())
+  public static PostgresConfig transformAnnotation(RequiresPostgres annotation) {
+    return new PostgresConfig.Builder(annotation.version())
         .build();
   }
 

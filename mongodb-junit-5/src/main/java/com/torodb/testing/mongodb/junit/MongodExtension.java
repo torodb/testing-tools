@@ -17,15 +17,16 @@
 package com.torodb.testing.mongodb.junit;
 
 import com.torodb.testing.core.junit5.AnnotationFinder;
-import com.torodb.testing.core.junit5.SimplifiedParameterResolver;
+import com.torodb.testing.core.junit5.CloseableParameterResolver;
 import com.torodb.testing.mongodb.docker.Mongod;
 import com.torodb.testing.mongodb.docker.SingleMongod;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+
 /**
  *
  */
-public class MongodExtension extends SimplifiedParameterResolver<Mongod> {
+public class MongodExtension extends CloseableParameterResolver<Mongod> {
 
   @Override
   protected Class<Mongod> getParameterClass() {
