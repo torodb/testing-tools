@@ -27,8 +27,9 @@ public enum EnumVersion implements PostgresVersion {
   v9_3(9,3, SQLDialect.POSTGRES_9_3),
   v9_4(9,4, SQLDialect.POSTGRES_9_4),
   v9_5(9,5, SQLDialect.POSTGRES_9_5),
+  v9_6(9,6, SQLDialect.POSTGRES_9_5),
   
-  LATEST(9,5, SQLDialect.POSTGRES_9_5);
+  LATEST(9,6, SQLDialect.POSTGRES_9_5);
 
   private final int major;
   private final int minor;

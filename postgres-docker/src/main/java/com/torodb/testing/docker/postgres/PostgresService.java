@@ -29,9 +29,9 @@ import com.torodb.testing.docker.ImagePuller;
 import com.torodb.testing.docker.SimpleDockerService;
 import com.torodb.testing.docker.UntilStdLineContains;
 import com.torodb.testing.docker.WaitCondition;
+import com.torodb.testing.docker.sql.ConnectionOwnerDslContext;
 import com.torodb.testing.docker.sql.SqlService;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import org.postgresql.ds.PGSimpleDataSource;
 
 import java.io.BufferedReader;
@@ -188,7 +188,7 @@ public class PostgresService extends SimpleDockerService implements SqlService {
   @Override
   public DSLContext getDslContext() {
     checkRunning();
-    return DSL.using(getDatasource(), config.getVersion().getDialect());
+    return new ConnectionOwnerDslContext(dataSource, config.getVersion().getDialect());
   }
 
   @Override

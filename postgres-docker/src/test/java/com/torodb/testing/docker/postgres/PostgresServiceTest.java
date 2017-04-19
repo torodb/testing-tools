@@ -15,6 +15,7 @@
  */
 package com.torodb.testing.docker.postgres;
 
+import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
@@ -37,22 +38,24 @@ public class PostgresServiceTest {
 
       assert service.isRunning();
 
-      service.getDslContext().createTable("test")
-          .column("aint", SQLDataType.INTEGER)
-          .execute();
-
-      for (int i = 0; i < 10; i++) {
-        service.getDslContext().insertInto(DSL.table("test"))
-            .columns(DSL.field("aint"))
-            .values(i)
+      try (DSLContext dslContext = service.getDslContext()) {
+        dslContext.createTable("test")
+            .column("aint", SQLDataType.INTEGER)
             .execute();
-      }
 
-      Record1<Integer> countRecord = service.getDslContext().selectCount()
-          .from(DSL.table("test"))
-          .fetchAny();
-      Assertions.assertNotNull(countRecord);
-      Assertions.assertEquals(10, countRecord.value1().intValue());
+        for (int i = 0; i < 10; i++) {
+          dslContext.insertInto(DSL.table("test"))
+              .columns(DSL.field("aint"))
+              .values(i)
+              .execute();
+        }
+
+        Record1<Integer> countRecord = dslContext.selectCount()
+            .from(DSL.table("test"))
+            .fetchAny();
+        Assertions.assertNotNull(countRecord);
+        Assertions.assertEquals(10, countRecord.value1().intValue());
+      }
     }
 
   }
