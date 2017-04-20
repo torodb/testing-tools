@@ -50,6 +50,7 @@
         <module>postgres-junit-5</module>
         <module>mongodb-docker</module>
         <module>mongodb-junit-5</module>
+        <module>reporting</module>
     </modules>
     
     <dependencyManagement>
