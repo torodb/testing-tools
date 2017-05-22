@@ -47,6 +47,11 @@ public enum EnumVersion implements PostgresVersion {
   }
 
   @Override
+  public String toString() {
+    return major + "." + minor;
+  }
+
+  @Override
   public SQLDialect getDialect() {
     return dialect;
   }
