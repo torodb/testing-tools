@@ -18,8 +18,10 @@ package com.torodb.testing.docker;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Spliterators.AbstractSpliterator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  *
@@ -32,17 +34,29 @@ public interface UntilStdLinePredicate extends StdLogReaderWaitCondition, Predic
 
   @Override
   public default boolean lookForStartCondition(BufferedReader stdReader, BufferedReader errReader) {
-
-    return Stream.generate(() -> {
-      try {
-        while (errReader.ready()) {
-          return errReader.readLine();
+    return StreamSupport.stream(new AbstractSpliterator<String>(Long.MAX_VALUE, 0) {
+      @Override
+      public boolean tryAdvance(Consumer<? super String> action) {
+        try {
+          if (errReader.ready()) {
+            errReader.readLine();
+          }
+          
+          if (stdReader.ready()) {
+            String line = stdReader.readLine();
+            if (line != null) {
+              action.accept(line);
+              return true;
+            }
+            return false;
+          }
+          
+          return true;
+        } catch (IOException e) {
+          throw new RuntimeException(e);
         }
-        return stdReader.readLine();
-      } catch (IOException e) {
-        throw new RuntimeException(e);
       }
-    })
+    }, false)
         .filter(this)
         .findAny()
         .isPresent();
