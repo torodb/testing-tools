@@ -17,7 +17,9 @@
 package com.torodb.testing.docker;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  *
@@ -29,9 +31,18 @@ public interface UntilStdLinePredicate extends StdLogReaderWaitCondition, Predic
   public boolean test(String line);
 
   @Override
-  public default boolean lookForStartCondition(BufferedReader stdReader) {
+  public default boolean lookForStartCondition(BufferedReader stdReader, BufferedReader errReader) {
 
-    return stdReader.lines()
+    return Stream.generate(() -> {
+      try {
+        while (errReader.ready()) {
+          return errReader.readLine();
+        }
+        return stdReader.readLine();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    })
         .filter(this)
         .findAny()
         .isPresent();

@@ -24,11 +24,7 @@ import java.io.BufferedReader;
 @FunctionalInterface
 public interface StdLogReaderWaitCondition extends LogReaderWaitCondition {
 
-  public boolean lookForStartCondition(BufferedReader stdReader);
-
   @Override
-  public default boolean lookForStartCondition(BufferedReader stdReader, BufferedReader errReader) {
-    return lookForStartCondition(stdReader);
-  }
+  public boolean lookForStartCondition(BufferedReader stdReader, BufferedReader errReader);
 
 }

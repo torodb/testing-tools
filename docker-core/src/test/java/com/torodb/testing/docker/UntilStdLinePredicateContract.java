@@ -55,9 +55,12 @@ public interface UntilStdLinePredicateContract extends StdLogReaderWaitCondition
     UntilStdLinePredicate toTest = getUntilStdLinePredicate();
     
     getCorrectTexts().forEach(Unchecked.consumer((text) -> {
-      try (BufferedReader reader = createBufferedReader(text)) {
+      try (
+          BufferedReader inReader = createBufferedReader(text);
+          BufferedReader errReader = createBufferedReader(text);
+          ) {
         Assertions.assertTrue(
-            toTest.lookForStartCondition(reader),
+            toTest.lookForStartCondition(inReader, errReader),
             "text " + text + " should be recognized as a correct text"
         );
       }
@@ -70,9 +73,12 @@ public interface UntilStdLinePredicateContract extends StdLogReaderWaitCondition
     UntilStdLinePredicate toTest = getUntilStdLinePredicate();
 
     getIncorrectTexts().forEach(Unchecked.consumer((text) -> {
-      try (BufferedReader reader = createBufferedReader(text)) {
+      try (
+          BufferedReader inReader = createBufferedReader(text);
+          BufferedReader errReader = createBufferedReader(text);
+          ) {
         Assertions.assertFalse(
-            toTest.lookForStartCondition(reader),
+            toTest.lookForStartCondition(inReader, errReader),
             "text " + text + " should not be recognized as a correct text"
         );
       }
