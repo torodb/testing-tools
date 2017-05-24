@@ -33,7 +33,7 @@ import java.util.concurrent.CompletableFuture;
 @FunctionalInterface
 public interface LogReaderWaitCondition extends WaitCondition {
 
-  public boolean lookForStartCondition(BufferedReader stdReader, BufferedReader errReader);
+  public boolean lookForStartCondition(BufferedReader stdReader);
 
   @Override
   public default boolean lookForStartCondition(DockerClient docker, String cointainerId) {
@@ -42,17 +42,14 @@ public interface LogReaderWaitCondition extends WaitCondition {
         PipedInputStream errInPipe = new PipedInputStream(10_240);
         BufferedReader stdReader = new BufferedReader(
             new InputStreamReader(outInPipe, Charsets.UTF_8));
-        BufferedReader errReader = new BufferedReader(
-            new InputStreamReader(errInPipe, Charsets.UTF_8));
         PipedOutputStream outOutPipe = new PipedOutputStream(outInPipe);
-        PipedOutputStream errOutPipe = new PipedOutputStream(errInPipe);
     ) {
       CompletableFuture<Void> attachFuture = CompletableFuture.runAsync(Blocking.runnable(() -> {
-        attach(docker, cointainerId, outOutPipe, errOutPipe);
+        attach(docker, cointainerId, outOutPipe);
       }));
 
       CompletableFuture<Boolean> readLogsFuture = CompletableFuture.supplyAsync(Blocking.supplier(
-          () -> readLogs(stdReader, errReader))
+          () -> readLogs(stdReader))
       );
 
       waitUntilFinish(attachFuture, readLogsFuture);
@@ -68,19 +65,19 @@ public interface LogReaderWaitCondition extends WaitCondition {
   }
 
   static void attach(DockerClient docker, String containerId,
-      PipedOutputStream outOutPipe, PipedOutputStream errOutPipe) {
+      PipedOutputStream outOutPipe) {
     try {
       docker.attachContainer(containerId,
           DockerClient.AttachParameter.LOGS, DockerClient.AttachParameter.STDOUT,
           DockerClient.AttachParameter.STDERR, DockerClient.AttachParameter.STREAM)
-          .attach(outOutPipe, errOutPipe, false);
+          .attach(outOutPipe, outOutPipe, false);
     } catch (IOException | DockerException | InterruptedException ex) {
       throw new RuntimeException(ex);
     }
   }
 
-  default boolean readLogs(BufferedReader stdReader, BufferedReader errReader) {
-    return lookForStartCondition(stdReader, errReader);
+  default boolean readLogs(BufferedReader stdReader) {
+    return lookForStartCondition(stdReader);
   }
 
   static void waitUntilFinish(

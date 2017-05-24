@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 @RunWith(JUnitPlatform.class)
-public class UntilStdLineContainsTest implements UntilStdLinePredicateContract {
+public class UntilLineContainsTest implements UntilLinePredicateContract {
 
   private final String[] corrects = new String[]{
     "A correct line",
@@ -44,7 +44,7 @@ public class UntilStdLineContainsTest implements UntilStdLinePredicateContract {
   private final UntilStdLineContains instance = new UntilStdLineContains(targetText);
 
   @Override
-  public UntilStdLinePredicate getUntilStdLinePredicate() {
+  public UntilLinePredicate getUntilLinePredicate() {
     return instance;
   }
 

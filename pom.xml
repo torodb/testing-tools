@@ -48,6 +48,8 @@
         <module>sql-docker</module>
         <module>postgres-docker</module>
         <module>postgres-junit-5</module>
+        <module>mysql-docker</module>
+        <module>mysql-junit-5</module>
         <module>mongodb-docker</module>
         <module>mongodb-junit-5</module>
         <module>reporting</module>

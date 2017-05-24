@@ -13,28 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.torodb.testing.docker.mysql.junit5;
 
-package com.torodb.testing.docker;
+import com.torodb.testing.docker.mysql.EnumVersion;
+import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.io.BufferedReader;
-import java.util.function.Predicate;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
  */
-@FunctionalInterface
-public interface UntilStdLinePredicate extends StdLogReaderWaitCondition, Predicate<String> {
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@ExtendWith(MysqlServiceExtension.class)
+public @interface RequiresMysql {
 
-  @Override
-  public boolean test(String line);
+  EnumVersion version();
 
-  @Override
-  public default boolean lookForStartCondition(BufferedReader stdReader) {
-
-    return stdReader.lines()
-        .filter(this)
-        .findAny()
-        .isPresent();
-  }
+  boolean newForEachCase() default true;
 
 }

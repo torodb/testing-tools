@@ -13,23 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.torodb.testing.docker;
 
+import java.io.BufferedReader;
+import java.util.function.Predicate;
+
 /**
- * A {@link WaitCondition} that iterates on the log lines looking for the given string on
- * each line.
+ *
  */
-public class UntilStdLineContains implements UntilLinePredicate {
-
-  private final String containedString;
-
-  public UntilStdLineContains(String containedString) {
-    this.containedString = containedString;
-  }
+@FunctionalInterface
+public interface UntilLinePredicate extends LogReaderWaitCondition, Predicate<String> {
 
   @Override
-  public boolean test(String line) {
-    return line.contains(containedString);
+  public boolean test(String line);
+
+  @Override
+  public default boolean lookForStartCondition(BufferedReader stdReader) {
+
+    return stdReader.lines()
+        .filter(this)
+        .findAny()
+        .isPresent();
   }
 
 }

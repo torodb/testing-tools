@@ -13,22 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.torodb.testing.docker;
+package com.torodb.testing.docker.mysql;
 
-
-import java.io.BufferedReader;
+import org.jooq.SQLDialect;
 
 /**
  *
  */
-@FunctionalInterface
-public interface StdLogReaderWaitCondition extends LogReaderWaitCondition {
+public interface MysqlVersion {
 
-  public boolean lookForStartCondition(BufferedReader stdReader);
+  String getDockerImageRef();
 
-  @Override
-  public default boolean lookForStartCondition(BufferedReader stdReader, BufferedReader errReader) {
-    return lookForStartCondition(stdReader);
-  }
-
+  SQLDialect getDialect();
 }
