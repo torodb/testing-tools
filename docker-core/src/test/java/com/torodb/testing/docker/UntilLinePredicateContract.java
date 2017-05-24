@@ -25,17 +25,17 @@ import java.io.IOException;
 import java.util.stream.Stream;
 
 
-public interface UntilStdLinePredicateContract extends StdLogReaderWaitConditionContract {
+public interface UntilLinePredicateContract extends LogReaderWaitConditionContract {
 
-  public abstract UntilStdLinePredicate getUntilStdLinePredicate();
+  public abstract UntilLinePredicate getUntilLinePredicate();
 
   public abstract Stream<String> getCorrectTexts();
 
   public abstract Stream<String> getIncorrectTexts();
 
   @Override
-  public default StdLogReaderWaitCondition getStdLogReaderWaitCondition() {
-    return getUntilStdLinePredicate();
+  public default LogReaderWaitCondition getLogReaderWaitCondition() {
+    return getUntilLinePredicate();
   }
 
   @Override
@@ -52,15 +52,12 @@ public interface UntilStdLinePredicateContract extends StdLogReaderWaitCondition
   public default void whenPredicateMatchs() throws
       IOException {
 
-    UntilStdLinePredicate toTest = getUntilStdLinePredicate();
+    UntilLinePredicate toTest = getUntilLinePredicate();
     
     getCorrectTexts().forEach(Unchecked.consumer((text) -> {
-      try (
-          BufferedReader inReader = createBufferedReader(text);
-          BufferedReader errReader = createBufferedReader(text);
-          ) {
+      try (BufferedReader inReader = createBufferedReader(text)) {
         Assertions.assertTrue(
-            toTest.lookForStartCondition(inReader, errReader),
+            toTest.lookForStartCondition(inReader),
             "text " + text + " should be recognized as a correct text"
         );
       }
@@ -70,15 +67,12 @@ public interface UntilStdLinePredicateContract extends StdLogReaderWaitCondition
   @Test
   public default void whenPredicateDoesntMatch() throws
       IOException {
-    UntilStdLinePredicate toTest = getUntilStdLinePredicate();
+    UntilLinePredicate toTest = getUntilLinePredicate();
 
     getIncorrectTexts().forEach(Unchecked.consumer((text) -> {
-      try (
-          BufferedReader inReader = createBufferedReader(text);
-          BufferedReader errReader = createBufferedReader(text);
-          ) {
+      try (BufferedReader inReader = createBufferedReader(text)) {
         Assertions.assertFalse(
-            toTest.lookForStartCondition(inReader, errReader),
+            toTest.lookForStartCondition(inReader),
             "text " + text + " should not be recognized as a correct text"
         );
       }
@@ -93,13 +87,8 @@ public interface UntilStdLinePredicateContract extends StdLogReaderWaitCondition
     }
 
     @Override
-    public String getStdOutput() {
+    public String getOutput() {
       return stdOutput;
-    }
-
-    @Override
-    public String getErrOutput() {
-      return "";
     }
   }
 }

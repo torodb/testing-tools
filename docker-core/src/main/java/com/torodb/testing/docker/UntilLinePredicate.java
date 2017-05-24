@@ -13,18 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.torodb.testing.docker;
 
-
 import java.io.BufferedReader;
+import java.util.function.Predicate;
 
 /**
  *
  */
 @FunctionalInterface
-public interface StdLogReaderWaitCondition extends LogReaderWaitCondition {
+public interface UntilLinePredicate extends LogReaderWaitCondition, Predicate<String> {
 
   @Override
-  public boolean lookForStartCondition(BufferedReader stdReader, BufferedReader errReader);
+  public boolean test(String line);
+
+  @Override
+  public default boolean lookForStartCondition(BufferedReader stdReader) {
+
+    return stdReader.lines()
+        .filter(this)
+        .findAny()
+        .isPresent();
+  }
 
 }

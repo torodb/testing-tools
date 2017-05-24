@@ -21,16 +21,22 @@ import org.jooq.SQLDialect;
  *
  */
 public enum EnumVersion implements MysqlVersion {
-  v5_5(5,5, SQLDialect.MYSQL),
-  v5_6(5,6, SQLDialect.MYSQL),
-  v5_7(5,7, SQLDialect.MYSQL),
-  v8_0(8,0, SQLDialect.MYSQL),
-  
-  LATEST(5,7, SQLDialect.MYSQL);
+  v5_5(5, 5),
+  v5_6(5, 6),
+  v5_7(5, 7),
+  v8_0(8, 0),
+
+  LATEST(5, 7);
 
   private final int major;
   private final int minor;
   private final SQLDialect dialect;
+
+  private EnumVersion(int major, int minor) {
+    this.major = major;
+    this.minor = minor;
+    this.dialect = SQLDialect.MYSQL;
+  }
 
   private EnumVersion(int major, int minor, SQLDialect dialect) {
     this.major = major;

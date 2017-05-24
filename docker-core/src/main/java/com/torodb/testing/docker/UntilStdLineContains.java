@@ -16,10 +16,10 @@
 package com.torodb.testing.docker;
 
 /**
- * A {@link WaitCondition} that iterates on the std log lines looking for the given string on
+ * A {@link WaitCondition} that iterates on the log lines looking for the given string on
  * each line.
  */
-public class UntilStdLineContains implements UntilStdLinePredicate {
+public class UntilStdLineContains implements UntilLinePredicate {
 
   private final String containedString;
 

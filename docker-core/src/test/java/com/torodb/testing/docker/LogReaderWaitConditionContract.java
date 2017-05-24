@@ -24,9 +24,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.stream.Stream;
 
-public interface StdLogReaderWaitConditionContract {
+public interface LogReaderWaitConditionContract {
 
-  public abstract StdLogReaderWaitCondition getStdLogReaderWaitCondition();
+  public abstract LogReaderWaitCondition getLogReaderWaitCondition();
 
   public abstract Stream<OutputMessage> getCorrectMessages();
 
@@ -36,13 +36,12 @@ public interface StdLogReaderWaitConditionContract {
   public default void onCorrectMessages() throws
       IOException {
 
-    StdLogReaderWaitCondition toTest = getStdLogReaderWaitCondition();
+    LogReaderWaitCondition toTest = getLogReaderWaitCondition();
 
     getCorrectMessages().forEach(Unchecked.consumer((text) -> {
-      try (BufferedReader stdReader = createBufferedReader(text.getStdOutput());
-          BufferedReader errReader = createBufferedReader(text.getErrOutput())) {
+      try (BufferedReader reader = createBufferedReader(text.getOutput())) {
         Assertions.assertTrue(
-            toTest.lookForStartCondition(stdReader, errReader),
+            toTest.lookForStartCondition(reader),
             "text " + text + " should be recognized as a correct text"
         );
       }
@@ -52,13 +51,12 @@ public interface StdLogReaderWaitConditionContract {
   @Test
   public default void whenPredicateDoesntMatch() throws
       IOException {
-    StdLogReaderWaitCondition toTest = getStdLogReaderWaitCondition();
+    LogReaderWaitCondition toTest = getLogReaderWaitCondition();
 
     getCorrectMessages().forEach(Unchecked.consumer((text) -> {
-      try (BufferedReader stdReader = createBufferedReader(text.getStdOutput());
-          BufferedReader errReader = createBufferedReader(text.getErrOutput())) {
+      try (BufferedReader reader = createBufferedReader(text.getOutput())) {
         Assertions.assertFalse(
-            toTest.lookForStartCondition(stdReader, errReader),
+            toTest.lookForStartCondition(reader),
             "text " + text + " should not be recognized as a correct text"
         );
       }
@@ -70,9 +68,7 @@ public interface StdLogReaderWaitConditionContract {
   }
 
   public static interface OutputMessage {
-    String getStdOutput();
-
-    String getErrOutput();
+    String getOutput();
   }
 
 }
