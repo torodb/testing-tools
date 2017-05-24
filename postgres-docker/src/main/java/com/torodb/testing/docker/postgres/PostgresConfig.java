@@ -16,11 +16,12 @@
 package com.torodb.testing.docker.postgres;
 
 import com.google.common.base.Preconditions;
+import com.torodb.testing.docker.sql.SqlConfig;
 
 /**
  *
  */
-public class PostgresConfig {
+public class PostgresConfig implements SqlConfig {
 
   private final String username;
   private final String password;
@@ -41,18 +42,22 @@ public class PostgresConfig {
     return new Builder(version).build();
   }
 
+  @Override
   public String getUsername() {
     return username;
   }
 
+  @Override
   public String getPassword() {
     return password;
   }
 
+  @Override
   public String getHost() {
     return host;
   }
 
+  @Override
   public String getDb() {
     return db;
   }
