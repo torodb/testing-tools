@@ -41,6 +41,9 @@ public class DockerReplMongodTest {
   @ParameterizedTest
   @EnumSource(EnumVersion.class)
   public void startAndStop(EnumVersion version) {
+    if (version == EnumVersion.LATEST) {
+      return;
+    }
 
     try (ReplMongod mongoDbService = createService(version)) {
       mongoDbService.startAsync();

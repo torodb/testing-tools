@@ -13,22 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.torodb.testing.docker;
+package com.torodb.testing.docker.oracle.junit5;
+
+import com.torodb.testing.docker.oracle.EnumVersion;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * A {@link WaitCondition} that iterates on the log lines looking for the given string on
- * each line.
+ *
  */
-public class UntilStdLineContains implements UntilLinePredicate {
-  private final String containedString;
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@ExtendWith(OracleServiceExtension.class)
+public @interface RequiresOracle {
 
-  public UntilStdLineContains(String containedString) {
-    this.containedString = containedString;
-  }
+  EnumVersion version();
 
-  @Override
-  public boolean test(String line) {
-    return line.contains(containedString);
-  }
+  boolean newForEachCase() default true;
 
 }

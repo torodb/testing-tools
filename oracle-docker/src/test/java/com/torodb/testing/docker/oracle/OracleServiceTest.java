@@ -13,10 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.torodb.testing.docker.mysql;
+package com.torodb.testing.docker.oracle;
 
-import com.torodb.testing.docker.mysql.EnumVersion;
-import com.torodb.testing.docker.mysql.MysqlService;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;
@@ -28,7 +26,7 @@ import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 
 @RunWith(JUnitPlatform.class)
-public class MysqlServiceTest {
+public class OracleServiceTest {
 
   @ParameterizedTest
   @EnumSource(EnumVersion.class)
@@ -36,8 +34,10 @@ public class MysqlServiceTest {
     if (version == EnumVersion.LATEST) {
       return;
     }
+    
+    new OracleDataSource();
 
-    try (MysqlService service = MysqlService.defaultService(version)) {
+    try (OracleService service = OracleService.defaultService(version)) {
       service.startAsync();
       service.awaitRunning();
 
@@ -49,14 +49,14 @@ public class MysqlServiceTest {
             .execute();
 
         for (int i = 0; i < 10; i++) {
-          dslContext.insertInto(DSL.table("test"))
-              .columns(DSL.field("aint"))
+          dslContext.insertInto(DSL.table("\"test\""))
+              .columns(DSL.field("\"aint\""))
               .values(i)
               .execute();
         }
 
         Record1<Integer> countRecord = dslContext.selectCount()
-            .from(DSL.table("test"))
+            .from(DSL.table("\"test\""))
             .fetchAny();
         Assertions.assertNotNull(countRecord);
         Assertions.assertEquals(10, countRecord.value1().intValue());

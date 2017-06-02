@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.torodb.testing.docker.mysql;
+
+package com.torodb.testing.docker.oracle;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.net.HostAndPort;
-import com.mysql.cj.jdbc.MysqlDataSource;
 import com.spotify.docker.client.DockerClient;
 import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.ContainerConfig;
@@ -42,6 +42,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,45 +54,51 @@ import javax.sql.DataSource;
 /**
  *
  */
-public class MysqlService extends SimpleDockerService implements SqlService {
-  private static final int MYSQL_PORT = 3306;
-  private final MysqlConfig config;
+public class OracleService extends SimpleDockerService implements SqlService {
+  private static final int ORACLE_PORT = 1521;
+  private static final long SHM_SIZE = 1L * 1024 * 1024 * 1024;
+  private final OracleConfig config;
   private HostAndPort bindingHostAndPort;
   private DataSource dataSource;
 
-  public MysqlService(MysqlConfig config, WaitCondition waitCondition,
+  public OracleService(OracleConfig config, WaitCondition waitCondition,
       ImageInstaller imageInstaller) {
     super(waitCondition, imageInstaller);
     this.config = config;
   }
 
   /**
-   * Given a mysql version, creates a default service that, if needed, the image from Docker Hub.
+   * Given a oracle version, creates a default service that, if needed, the image from Docker Hub.
    *
-   * @param version the mysql version that will be used
-   * @return a service ready to be started that creates a mysql docker with the default
+   * @param version the oracle version that will be used
+   * @return a service ready to be started that creates a oracle docker with the default
    *         configuration.
    */
-  public static MysqlService defaultService(MysqlVersion version) {
-    MysqlConfig config = new MysqlConfig.Builder(version)
+  public static OracleService defaultService(OracleVersion version) {
+    OracleConfig config = new OracleConfig.Builder(version)
         .build();
     return defaultService(config);
   }
 
   /**
-   * Given a mysql config, creates a default service that, if needed, the image from Docker Hub.
+   * Given a oracle config, creates a default service that, if needed, the image from Docker Hub.
    *
-   * @param config the mysql config that will be used
-   * @return a service ready to be started that creates a mysql docker with the default
+   * @param config the oracle config that will be used
+   * @return a service ready to be started that creates a oracle docker with the default
    *         configuration.
    */
-  public static MysqlService defaultService(MysqlConfig config) {
-    UntilStdLineContains waitCondition = new UntilStdLineContains("Database started");
+  public static OracleService defaultService(OracleConfig config) {
+    UntilStdLineContains waitCondition = new UntilStdLineContains("DATABASE IS READY TO USE!");
     ImagePuller imageInstaller = new ImagePuller(
         config.getVersion().getDockerImageRef()
     );
 
-    return new MysqlService(config, waitCondition, imageInstaller);
+    return new OracleService(config, waitCondition, imageInstaller);
+  }
+  
+  @Override
+  protected Duration getTimeToWait() {
+    return Duration.ofMinutes(5);
   }
 
   @Override
@@ -100,7 +107,7 @@ public class MysqlService extends SimpleDockerService implements SqlService {
   }
 
   private String getMyDataVolumeName() {
-    return "mysql-" + System.identityHashCode(this);
+    return "oracle-" + System.identityHashCode(this);
   }
 
   @Override
@@ -111,13 +118,14 @@ public class MysqlService extends SimpleDockerService implements SqlService {
         .build()
     );
     builder.appendBinds(
-        HostConfig.Bind.from(volume).to("/var/lib/mysql").build()
+        HostConfig.Bind.from(volume).to("/u01/app/oracle/oradata").build()
     );
+    builder.shmSize(SHM_SIZE);
 
 
     Map<String, List<PortBinding>> portBindings = new HashMap<>();
     portBindings.put(
-        Integer.toString(MYSQL_PORT),
+        Integer.toString(ORACLE_PORT) + "/tcp",
         Lists.newArrayList(PortBinding.randomPort("0.0.0.0"))
     );
     
@@ -127,7 +135,6 @@ public class MysqlService extends SimpleDockerService implements SqlService {
   @Override
   protected void additionalContainerConfiguration(DockerClient client,
       ContainerConfig.Builder builder) throws DockerException, InterruptedException {
-    builder.exposedPorts(Integer.toString(MYSQL_PORT));
   }
 
   @Override
@@ -139,30 +146,30 @@ public class MysqlService extends SimpleDockerService implements SqlService {
   protected void afterStarted(DockerClient client, String containerId) throws DockerException,
       InterruptedException {
 
-    bindingHostAndPort = getBindingTcpPort(MYSQL_PORT)
+    bindingHostAndPort = getBindingTcpPort(ORACLE_PORT)
         .orElseThrow(() ->
-            new RuntimeException("There is no binding port for the mysql instance")
+            new RuntimeException("There is no binding port for the oracle instance")
         );
     dataSource = createDataSource(bindingHostAndPort);
   }
   
   protected DataSource createDataSource(HostAndPort bindingHostAndPort) {
-
-    MysqlDataSource ds = new MysqlDataSource();
-
-    ds.setPortNumber(bindingHostAndPort.getPort());
-    ds.setServerName(bindingHostAndPort.getHost());
+    OracleDataSource ds = new OracleDataSource();
+    //This can not be changed and the sid for connection is different
+    ds.setSid(config.getVersion().getSid());
+    ds.setPort(bindingHostAndPort.getPort());
+    ds.setHost(bindingHostAndPort.getHost());
     ds.setUser(config.getUsername());
     ds.setPassword(config.getPassword());
-    ds.setDatabaseName(config.getDb());
+    ds.setDatabase(config.getDb());
 
     try (
-        Connection conn = ds.getConnection();
-        Statement stat = conn.createStatement();
-        ResultSet rs = stat.executeQuery("SELECT 1")) {
+      Connection conn = ds.getConnection();
+      Statement stat = conn.createStatement();
+      ResultSet rs = stat.executeQuery("SELECT 1 FROM DUAL")) {
       rs.next();
     } catch (SQLException ex) {
-      throw new RuntimeException(ex.getLocalizedMessage());
+      throw new RuntimeException(ex);
     }
     return ds;
   }
@@ -179,7 +186,7 @@ public class MysqlService extends SimpleDockerService implements SqlService {
     return dataSource;
   }
 
-  public MysqlConfig getConfig() {
+  public OracleConfig getConfig() {
     return config;
   }
 
@@ -191,7 +198,7 @@ public class MysqlService extends SimpleDockerService implements SqlService {
 
   @Override
   protected List<String> getCmd() {
-    try (InputStream is = MysqlService.class.getResourceAsStream("mysql-docker-cmd.sh");
+    try (InputStream is = OracleService.class.getResourceAsStream("oracle-docker-cmd.sh");
         BufferedReader reader = new BufferedReader(new InputStreamReader(is, Charsets.UTF_8))) {
       String script = reader.lines().collect(Collectors.joining("\n"));
       return Lists.newArrayList(
@@ -207,11 +214,10 @@ public class MysqlService extends SimpleDockerService implements SqlService {
   @Override
   protected List<String> getEnv() {
     return Lists.newArrayList(
-        "MYSQL_ROOT_PASSWORD=" + config.getPassword(),
-        "MYSQL_USER=" + config.getUsername(),
-        "MYSQL_PASSWORD=" + config.getPassword(),
-        "MYSQL_DATABASE=" + config.getDb()
+        "ORACLE_USER=" + config.getUsername(),
+        "ORACLE_PWD=" + config.getPassword(),
+        "ORACLE_PDB=" + config.getDb(),
+        "ORACLE_CHARACTERSET=UTF-8"
     );
   }
-
 }

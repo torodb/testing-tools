@@ -31,6 +31,9 @@ public class PostgresServiceTest {
   @ParameterizedTest
   @EnumSource(EnumVersion.class)
   public void startAndStop(EnumVersion version) {
+    if (version == EnumVersion.LATEST) {
+      return;
+    }
 
     try (PostgresService service = PostgresService.defaultService(version)) {
       service.startAsync();

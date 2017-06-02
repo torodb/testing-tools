@@ -13,22 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.torodb.testing.docker;
+package com.torodb.testing.docker.oracle;
 
-/**
- * A {@link WaitCondition} that iterates on the log lines looking for the given string on
- * each line.
- */
-public class UntilStdLineContains implements UntilLinePredicate {
-  private final String containedString;
+import org.junit.Test;
 
-  public UntilStdLineContains(String containedString) {
-    this.containedString = containedString;
-  }
+public class OracleDriverTest {
 
-  @Override
-  public boolean test(String line) {
-    return line.contains(containedString);
+  @Test
+  public void driverLoading() {
+    new OracleDataSource();
   }
 
 }

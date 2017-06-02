@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.torodb.testing.docker.mysql;
+
+package com.torodb.testing.docker.oracle;
 
 import com.google.common.base.Preconditions;
 import com.torodb.testing.docker.sql.SqlConfig;
 
-/**
- *
- */
-public class MysqlConfig implements SqlConfig {
+public class OracleConfig implements SqlConfig {
 
   private final String username;
   private final String password;
   private final String host;
   private final String db;
-  private final MysqlVersion version;
+  private final OracleVersion version;
 
-  public MysqlConfig(String username, String password, String host, String db,
-      MysqlVersion version) {
+  public OracleConfig(String username, String password, String host, String db,
+      OracleVersion version) {
     this.username = username;
     this.password = password;
     this.host = host;
@@ -38,7 +36,7 @@ public class MysqlConfig implements SqlConfig {
     this.version = version;
   }
 
-  public static MysqlConfig getDefaultConfig(MysqlVersion version) {
+  public static OracleConfig getDefaultConfig(OracleVersion version) {
     return new Builder(version).build();
   }
 
@@ -62,24 +60,24 @@ public class MysqlConfig implements SqlConfig {
     return db;
   }
 
-  public MysqlVersion getVersion() {
+  public OracleVersion getVersion() {
     return version;
   }
 
   public static class Builder {
-    private String username = "test";
+    // Changing the username is not supported
+    private String username = "system";
     private String password = "test";
     private String host = "0.0.0.0";
-    private String db = "test";
-    private MysqlVersion version;
+    private String db = "ORCLCDB1";
+    private OracleVersion version;
 
-    public Builder(MysqlVersion version) {
+    public Builder(OracleVersion version) {
       this.version = version;
     }
 
     public Builder setUsername(String username) {
-      this.username = username;
-      return this;
+      throw new UnsupportedOperationException("Can not change the username");
     }
 
     public Builder setPassword(String password) {
@@ -93,19 +91,18 @@ public class MysqlConfig implements SqlConfig {
     }
 
     public Builder setDb(String db) {
-      this.db = db;
-      return this;
+      throw new UnsupportedOperationException("Can not change the database");
     }
 
-    public Builder setVersion(MysqlVersion version) {
+    public Builder setVersion(OracleVersion version) {
       this.version = version;
       return this;
     }
 
-    public MysqlConfig build() {
-      Preconditions.checkState(version != null, "A mysql version must be specified");
+    public OracleConfig build() {
+      Preconditions.checkState(version != null, "A oracle version must be specified");
 
-      return new MysqlConfig(username, password, host, db, version);
+      return new OracleConfig(username, password, host, db, version);
     }
 
   }

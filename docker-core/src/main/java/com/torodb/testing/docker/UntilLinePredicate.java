@@ -18,6 +18,7 @@ package com.torodb.testing.docker;
 
 import java.io.BufferedReader;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  *

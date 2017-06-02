@@ -32,14 +32,12 @@ import java.util.concurrent.CompletableFuture;
  */
 @FunctionalInterface
 public interface LogReaderWaitCondition extends WaitCondition {
-
   public boolean lookForStartCondition(BufferedReader stdReader);
 
   @Override
   public default boolean lookForStartCondition(DockerClient docker, String cointainerId) {
     //Beware: BufferedReades must be declared before PipedOputputStreams to be closed properly!
     try (PipedInputStream outInPipe = new PipedInputStream(10_240);
-        PipedInputStream errInPipe = new PipedInputStream(10_240);
         BufferedReader stdReader = new BufferedReader(
             new InputStreamReader(outInPipe, Charsets.UTF_8));
         PipedOutputStream outOutPipe = new PipedOutputStream(outInPipe);

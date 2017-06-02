@@ -50,6 +50,8 @@
         <module>postgres-junit-5</module>
         <module>mysql-docker</module>
         <module>mysql-junit-5</module>
+        <module>oracle-docker</module>
+        <module>oracle-junit-5</module>
         <module>mongodb-docker</module>
         <module>mongodb-junit-5</module>
         <module>reporting</module>
@@ -94,6 +96,37 @@
             </plugin>
         </plugins>
     </build>
+ 
+    <profiles>
+        <profile>
+            <id>exclude-oracle</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*Oracle*</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>oracle</id>
+            <dependencies>
+                <dependency>
+                    <groupId>oracle</groupId>
+                    <artifactId>oracle-jdbc-driver</artifactId>
+                    <version>12c-release2</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
     
     <repositories>
         <repository>

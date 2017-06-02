@@ -13,22 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.torodb.testing.docker;
 
-/**
- * A {@link WaitCondition} that iterates on the log lines looking for the given string on
- * each line.
- */
-public class UntilStdLineContains implements UntilLinePredicate {
-  private final String containedString;
+package com.torodb.testing.docker.oracle;
 
-  public UntilStdLineContains(String containedString) {
-    this.containedString = containedString;
-  }
+import org.jooq.SQLDialect;
 
-  @Override
-  public boolean test(String line) {
-    return line.contains(containedString);
-  }
+public interface OracleVersion {
 
+  String getSid();
+  
+  String getDockerImageRef();
+
+  SQLDialect getDialect();
 }

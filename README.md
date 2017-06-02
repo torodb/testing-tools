@@ -36,6 +36,39 @@ Currently the project is on beta version, there are no released versions and the
 code is on the devel branch. Please use consider it the main branch of this repository
 until the first release is done.
 
+## Get Oracle image and driver
+
+### Build Oracle image
+
+Clone the official Oracle docker-images repository:
+
+    git clone https://github.com/oracle/docker-images
+
+[Download Oracle XE 11.2.0.1 for Linux](http://www.oracle.com/technetwork/database/database-technologies/express-edition/downloads/index.html),
+copy the zip into `docker-images/OracleDatabase/dockerfiles/11.2.0.1` and run following commands:
+
+    cd docker-images/OracleDatabase/dockerfiles
+    bash buildDockerImage.sh -x -v 11.2.0.2
+
+To generate the fast startup instance use following commands:
+
+    docker run -d --name oracle-database -p 0.0.0.0::1521 \
+        -e ORACLE_PWD=test -e ORACLE_PDB=test -e ORACLE_CHARACTERSET=UTF-8 \
+        --shm-size=1g oracle/database:11.2.0.2-xe bash -x /u01/app/oracle/runOracle.sh
+    while ! docker exec oracle-database grep -q "DATABASE IS READY TO USE!"; do sleep 1; done
+    docker exec oracle-database su -p oracle -c 'echo "SHUTDOWN"|sqlplus / as sysdba'
+    docker exec oracle-database tar cz -C "$ORACLE_BASE" -f oradata.tar.gz oradata
+    docker commit oracle-database oracle/database:11.2.0.2-xe-fast
+
+
+### Install Oracle JDBC driver
+
+You can get the driver from: http://www.oracle.com/technetwork/database/features/jdbc/index-091264.html
+And install it in your local repository with maven:
+
+    mvn install:install-file -Dfile=<path-to-file> -DgroupId=oracle \
+        -DartifactId=oracle-jdbc-driver -Dversion=12c-release2 -Dpackaging=jar
+
 ## Code QA
  * Master branch: 
 [![Build Status](https://travis-ci.org/torodb/testing-tools.svg?branch=master)](https://travis-ci.org/torodb/testing-tools)
