@@ -15,8 +15,6 @@
  */
 package com.torodb.testing.docker.mysql;
 
-import com.torodb.testing.docker.mysql.EnumVersion;
-import com.torodb.testing.docker.mysql.MysqlService;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.impl.DSL;

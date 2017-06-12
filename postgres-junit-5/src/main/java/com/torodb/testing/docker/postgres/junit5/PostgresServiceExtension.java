@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.torodb.testing.docker.postgres.junit5;
 
+package com.torodb.testing.docker.postgres.junit5;
 
 import com.torodb.testing.core.junit5.AnnotationFinder;
 import com.torodb.testing.core.junit5.CloseableParameterResolver;
@@ -22,11 +22,6 @@ import com.torodb.testing.docker.postgres.PostgresConfig;
 import com.torodb.testing.docker.postgres.PostgresService;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-
-
-/**
- *
- */
 public class PostgresServiceExtension extends CloseableParameterResolver<PostgresService> {
 
   @Override
