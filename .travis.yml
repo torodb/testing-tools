@@ -1,0 +1,56 @@
+language: java
+sudo: required
+dist: trusty
+jdk: oraclejdk8
+
+before_install:
+  - wget https://archive.apache.org/dist/maven/maven-3/3.2.2/binaries/apache-maven-3.2.2-bin.tar.gz
+  - tar xf apache-maven-3.2.2-bin.tar.gz
+  - export M2_HOME=$PWD/apache-maven-3.2.2
+  - export PATH=$M2_HOME/bin:$PATH
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+#Required to use Codacy
+  - sudo apt-get install jq
+  - wget -O ~/codacy-coverage-reporter-assembly-latest.jar $(curl https://api.github.com/repos/codacy/codacy-coverage-reporter/releases/latest | jq -r .assets[0].browser_download_url)
+
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
+   
+cache:
+  directories:
+  - $HOME/.m2/repository
+  
+before_cache:
+  - rm -f $HOME/.m2/repository/com/torodb
+
+before_script:
+  - export GIT_BRANCH=$TRAVIS_BRANCH
+  
+script: mvn -Psafer -Pintegration -B -e -T 1C -Dcheckstyle.consoleOutput=false --update-snapshots verify
+
+after_success:
+  - |
+    if [ "$TRAVIS_EVENT_TYPE" != cron ] && [ "$TRAVIS_REPO_SLUG" == torodb/testing-tools ]
+    then
+        # Upload reports to Codecov
+        bash <(curl -s https://codecov.io/bash) || echo 'Codecov did not collect coverage reports';
+        # Upload reports to Codacy
+        java -cp ~/codacy-coverage-reporter-assembly-latest.jar com.codacy.CodacyCoverageReporter -l Java -r reporting/target/site/jacoco-aggregate/jacoco.xml || echo 'Codacy report fail'
+    else
+        echo 'Skipping a metrics reports because this branch is not permitted'
+    fi
+
+before_deploy:
+- echo "<settings><servers><server><id>ossrh-snapshot</id><username>\${env.MAVEN_DEPLOY_USER}</username><password>\${env.MAVEN_DEPLOY_PASS}</password></server><server><id>ossrh-release</id><username>\${env.MAVEN_DEPLOY_USER}</username><password>\${env.MAVEN_DEPLOY_PASS}</password></server></servers></settings>" > ~/settings.xml
+  
+deploy:
+- provider: script
+  script: mvn -B -e -T 1C -Pdeploy -DskipTests=true -Dcheckstyle.consoleOutput=false deploy --settings ~/settings.xml
+  skip_cleanup: true
+  on:
+    repo: torodb/testing-tools
+    branch: devel
+    jdk: oraclejdk8

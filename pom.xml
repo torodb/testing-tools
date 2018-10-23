@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.torodb</groupId>
+        <artifactId>parent-pom</artifactId>
+        <version>1.0.1</version>
+    </parent>
+    
+    <groupId>com.torodb.testing</groupId>
+    <artifactId>testing-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    
+    <name>Testing utilities: parent</name>
+    <description>
+        This is a aggregation and parent pom used by ToroDB testing utility projects.
+    </description>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://opensource.org/licenses/Apache-2.0</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git@github.com:torodb/testing.git</connection>
+        <developerConnection>scm:git:git@github.com:torodb/testing.git</developerConnection>
+        <url>git@github.com:torodb/mongowp.git</url>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/torodb/testing/issues</url>
+    </issueManagement>
+
+    <properties>
+        <license.header.license>apache20</license.header.license>
+        <license.header.project.name>ToroDB Testing</license.header.project.name>
+        <license.header.project.inceptionYear>2017</license.header.project.inceptionYear>
+    </properties>
+    
+    <modules>
+        <module>testing-core</module>
+        <module>core-junit5</module>
+        <module>docker-core</module>
+        <module>sql-docker</module>
+        <module>postgres-docker</module>
+        <module>postgres-junit-5</module>
+        <module>mysql-docker</module>
+        <module>mysql-junit-5</module>
+        <module>oracle-docker</module>
+        <module>oracle-junit-5</module>
+        <module>mongodb-docker</module>
+        <module>mongodb-junit-5</module>
+        <module>reporting</module>
+    </modules>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>5.0.0-M4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.platform</groupId>
+                <artifactId>junit-platform-runner</artifactId>
+                <version>1.0.0-M4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>5.0.0-M4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-params</artifactId>
+                <version>5.0.0-M4</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jool</artifactId>
+                <version>0.9.12</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+ 
+    <profiles>
+        <profile>
+            <id>exclude-oracle</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/*Oracle*</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>oracle</id>
+            <dependencies>
+                <dependency>
+                    <groupId>oracle</groupId>
+                    <artifactId>oracle-jdbc-driver</artifactId>
+                    <version>12c-release2</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+    
+    <repositories>
+        <repository>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <id>OSSRH</id>
+            <url>https://oss.sonatype.org/content/groups/public</url>
+        </repository>
+    </repositories>
+    
+    
+</project>
