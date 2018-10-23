@@ -63,7 +63,7 @@ public abstract class AbstractDockerService extends AbstractIdleService implemen
   }
   
   protected Duration getTimeToWait() {
-    return Duration.ofMinutes(1);
+    return Duration.ofMinutes(2);
   }
 
   protected Stream<String> streamVolumesNamesToRemove() {

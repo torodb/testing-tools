@@ -15,11 +15,11 @@
  */
 package com.torodb.testing.docker.postgres.junit5;
 
-
 import com.torodb.testing.core.junit5.AnnotationFinder;
 import com.torodb.testing.core.junit5.CloseableParameterResolver;
 import com.torodb.testing.docker.postgres.PostgresConfig;
 import com.torodb.testing.docker.postgres.PostgresService;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
 
 

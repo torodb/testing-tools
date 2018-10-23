@@ -15,14 +15,12 @@
  */
 package com.torodb.testing.docker.oracle.junit5;
 
-
 import com.torodb.testing.core.junit5.AnnotationFinder;
 import com.torodb.testing.core.junit5.CloseableParameterResolver;
 import com.torodb.testing.docker.oracle.OracleConfig;
 import com.torodb.testing.docker.oracle.OracleService;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
-
-
 
 /**
  *

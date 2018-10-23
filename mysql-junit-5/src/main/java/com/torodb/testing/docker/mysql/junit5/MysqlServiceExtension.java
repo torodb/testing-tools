@@ -15,14 +15,12 @@
  */
 package com.torodb.testing.docker.mysql.junit5;
 
-
 import com.torodb.testing.core.junit5.AnnotationFinder;
 import com.torodb.testing.core.junit5.CloseableParameterResolver;
 import com.torodb.testing.docker.mysql.MysqlConfig;
 import com.torodb.testing.docker.mysql.MysqlService;
+
 import org.junit.jupiter.api.extension.ExtensionContext;
-
-
 
 /**
  *
